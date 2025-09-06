@@ -55,10 +55,18 @@
         page-offset = <0>;
         display-offset = <0>;
         multiplex-ratio = <31>;
+<<<<<<< HEAD
         segment-remap;
         com-invdir;
         com-sequential;
         prechargep = <0x22>;
+=======
+<<<<<<< HEAD
+        prechargep = <0xF1>;
+=======
+>>>>>>> ec32d3fa2a6a63067f180e81acf3b0ab56a5fd84
+        label = "OLED";
+>>>>>>> d8d1da1baa14023c874a3eee5e8a3eed6dcdf0fb
     };
 };
 
