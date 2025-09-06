@@ -1,7 +1,12 @@
+#include <dt-bindings/zmk/matrix_transform.h>
 #include <zephyr/dt-bindings/pinctrl/nrf-pinctrl.h>
+#include <dt-bindings/i2c/i2c.h>
 
 / {
-    chosen { zmk,kscan = &kscan0; };
+    chosen { 
+        zmk,kscan = &kscan0;
+        zephyr,display = &oled;
+    };
 
     kscan0: kscan {
         compatible = "zmk,kscan-gpio-matrix";
@@ -33,39 +38,44 @@
     };
 };
 
-&i2c1 {
-    status = "okay";
-    pinctrl-0 = <&i2c1_default>;
-    pinctrl-1 = <&i2c1_sleep>;
+&i2c0 {
+    compatible = "nordic,nrf-twi";
+    pinctrl-0 = <&i2c0_default>;
+    pinctrl-1 = <&i2c0_sleep>;
     pinctrl-names = "default", "sleep";
     clock-frequency = <I2C_BITRATE_STANDARD>;
+    status = "okay";
 
-    oled0: oled@3c {
+    oled: ssd1306@3c {
         compatible = "solomon,ssd1306fb";
-        reg = <0x3C>;
+        reg = <0x3c>;
         width = <128>;
         height = <32>;
         segment-offset = <0>;
         page-offset = <0>;
         display-offset = <0>;
         multiplex-ratio = <31>;
-        label = "OLED";
+        segment-remap;
+        com-invdir;
+        com-sequential;
+        prechargep = <0x22>;
     };
 };
 
 &pinctrl {
-    i2c1_default: i2c1_default {
+    i2c0_default: i2c0_default {
         group1 {
-            psels = <NRF_PSEL(TWIM_SCL, 0, 20)>,
-                    <NRF_PSEL(TWIM_SDA, 0, 17)>;
-            nordic,drive-mode = <NRF_DRIVE_S0D1>;
+            psels = <NRF_PSEL(TWIM_SDA, 0, 17)>,
+                    <NRF_PSEL(TWIM_SCL, 0, 20)>;
+            bias-pull-up;
         };
     };
 
-    i2c1_sleep: i2c1_sleep {
+    i2c0_sleep: i2c0_sleep {
         group1 {
-            psels = <NRF_PSEL(TWIM_SCL, 0, 20)>,
-                    <NRF_PSEL(TWIM_SDA, 0, 17)>;
+            psels = <NRF_PSEL(TWIM_SDA, 0, 17)>,
+                    <NRF_PSEL(TWIM_SCL, 0, 20)>;
+            bias-pull-up;
             low-power-enable;
         };
     };
