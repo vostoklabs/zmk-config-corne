@@ -38,13 +38,12 @@
     };
 };
 
-&i2c0 {
-    compatible = "nordic,nrf-twi";
-    pinctrl-0 = <&i2c0_default>;
-    pinctrl-1 = <&i2c0_sleep>;
+&i2c1 {
+    status = "okay";
+    pinctrl-0 = <&i2c1_default>;
+    pinctrl-1 = <&i2c1_sleep>;
     pinctrl-names = "default", "sleep";
     clock-frequency = <I2C_BITRATE_STANDARD>;
-    status = "okay";
 
     oled: ssd1306@3c {
         compatible = "solomon,ssd1306fb";
@@ -55,34 +54,24 @@
         page-offset = <0>;
         display-offset = <0>;
         multiplex-ratio = <31>;
-<<<<<<< HEAD
-        segment-remap;
-        com-invdir;
-        com-sequential;
-        prechargep = <0x22>;
-=======
-<<<<<<< HEAD
         prechargep = <0xF1>;
-=======
->>>>>>> ec32d3fa2a6a63067f180e81acf3b0ab56a5fd84
         label = "OLED";
->>>>>>> d8d1da1baa14023c874a3eee5e8a3eed6dcdf0fb
     };
 };
 
 &pinctrl {
-    i2c0_default: i2c0_default {
+    i2c1_default: i2c1_default {
         group1 {
-            psels = <NRF_PSEL(TWIM_SDA, 0, 17)>,
-                    <NRF_PSEL(TWIM_SCL, 0, 20)>;
+            psels = <NRF_PSEL(TWIM_SCL, 0, 20)>,
+                    <NRF_PSEL(TWIM_SDA, 0, 17)>;
             bias-pull-up;
         };
     };
 
-    i2c0_sleep: i2c0_sleep {
+    i2c1_sleep: i2c1_sleep {
         group1 {
-            psels = <NRF_PSEL(TWIM_SDA, 0, 17)>,
-                    <NRF_PSEL(TWIM_SCL, 0, 20)>;
+            psels = <NRF_PSEL(TWIM_SCL, 0, 20)>,
+                    <NRF_PSEL(TWIM_SDA, 0, 17)>;
             bias-pull-up;
             low-power-enable;
         };
