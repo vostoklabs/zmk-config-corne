@@ -6,7 +6,7 @@ jobs:
     name: Build Corne (left & right)
     runs-on: ubuntu-latest
     container:
-      image: ghcr.io/zmkfirmware/zmk-build-arm:stable
+      image: ghcr.io/zmkfirmware/zmk-dev-arm:stable
     steps:
       - name: Checkout config repo
         uses: actions/checkout@v4
