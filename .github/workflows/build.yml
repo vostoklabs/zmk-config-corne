@@ -3,4 +3,34 @@ on: [push, pull_request, workflow_dispatch]
 
 jobs:
   build:
-    uses: zmkfirmware/zmk/.github/workflows/build-user-config.yml@main
+    name: Build Corne (left & right)
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/zmkfirmware/zmk-build-arm:stable
+    steps:
+      - name: Checkout config repo
+        uses: actions/checkout@v4
+
+      - name: Initialize West (ZMK + deps)
+        run: |
+          west init -l config
+          west update
+
+      - name: Build left
+        run: |
+          west build -s zmk/app -b nice_nano_v2 -- -DSHIELD=corne_hw_left -DZMK_CONFIG=$GITHUB_WORKSPACE/config
+          cp build/zephyr/zmk.uf2 corne_hw_left-nice_nano_v2-zmk.uf2
+
+      - name: Build right
+        run: |
+          rm -rf build
+          west build -s zmk/app -b nice_nano_v2 -- -DSHIELD=corne_hw_right -DZMK_CONFIG=$GITHUB_WORKSPACE/config
+          cp build/zephyr/zmk.uf2 corne_hw_right-nice_nano_v2-zmk.uf2
+
+      - name: Upload firmware artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: firmware
+          path: |
+            corne_hw_left-nice_nano_v2-zmk.uf2
+            corne_hw_right-nice_nano_v2-zmk.uf2
