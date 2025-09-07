@@ -1,0 +1,17 @@
+if SHIELD_CORNE_HW_RIGHT
+
+config ZMK_KEYBOARD_NAME
+    default "Corne HW"
+
+config ZMK_SPLIT
+    default y
+
+config ZMK_SPLIT_BLE
+    default y
+
+config ZMK_USB
+    default y
+
+endif
+
+

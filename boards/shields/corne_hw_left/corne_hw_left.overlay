@@ -1,0 +1,91 @@
+#include <dt-bindings/zmk/matrix_transform.h>
+#include <zephyr/dt-bindings/pinctrl/nrf-pinctrl.h>
+#include <dt-bindings/i2c/i2c.h>
+
+/ {
+    chosen { 
+        zmk,kscan = &kscan0;
+        zmk,matrix-transform = &default;
+    };
+
+    kscan0: kscan {
+        compatible = "zmk,kscan-gpio-matrix";
+        label = "KSCAN_LEFT";
+        /* Left half rows: P1.00, P0.11, P1.04, P1.06 */
+        row-gpios = <&gpio1 0  (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>,  /* P1.00 */
+                    <&gpio0 11 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>,  /* P0.11 */
+                    <&gpio1 4  (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>,  /* P1.04 */
+                    <&gpio1 6  (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>;  /* P1.06 */
+        /* Left half cols (left→right): P0.02, P1.15, P1.13, P1.11, P0.10, P0.09 */
+        col-gpios = <&gpio0 2  GPIO_ACTIVE_HIGH>,  /* P0.02 */
+                    <&gpio1 15 GPIO_ACTIVE_HIGH>,  /* P1.15 */
+                    <&gpio1 13 GPIO_ACTIVE_HIGH>,  /* P1.13 */
+                    <&gpio1 11 GPIO_ACTIVE_HIGH>,  /* P1.11 */
+                    <&gpio0 10 GPIO_ACTIVE_HIGH>,  /* P0.10 */
+                    <&gpio0 9  GPIO_ACTIVE_HIGH>;  /* P0.09 */
+        diode-direction = "col2row";
+        debounce-press-ms = <5>;
+        debounce-release-ms = <5>;
+        wakeup-source;
+    };
+
+    default: matrix_transform {
+        compatible = "zmk,matrix-transform";
+        columns = <6>;
+        rows = <4>;
+        /* Map physical (row-major) to 12-wide global positions.
+         * Row 0 → 0..5 (reversed to match wiring)
+         * Row 1 → 12..17 (reversed)
+         * Row 2 → 24..29 (reversed)
+         * Row 3 (thumbs) → left side 36..38; unused cols mapped to right-side slots (won't be pressed)
+         */
+        /* Left rows to 12-wide positions (columns ordered left→right): */
+        map = <0 1 2 3 4 5   12 13 14 15 16 17   24 25 26 27 28 29   36 37 38 39 40 41>;
+    };
+};
+
+&i2c0 {
+    status = "okay";
+    compatible = "nordic,nrf-twi";
+    pinctrl-0 = <&i2c0_default>;
+    pinctrl-1 = <&i2c0_sleep>;
+    pinctrl-names = "default", "sleep";
+    clock-frequency = <I2C_BITRATE_STANDARD>;
+
+    oled: ssd1306@3c {
+        compatible = "solomon,ssd1306fb";
+        status = "okay";
+        reg = <0x3c>;
+        width = <128>;
+        height = <32>;
+        segment-offset = <0>;
+        page-offset = <0>;
+        display-offset = <0>;
+        multiplex-ratio = <31>;
+        segment-remap;
+        com-invdir;
+        com-sequential;
+        prechargep = <0x22>;
+    };
+};
+
+&pinctrl {
+    i2c0_default: i2c0_default {
+        group1 {
+            psels = <NRF_PSEL(TWIM_SCL, 0, 20)>,
+                    <NRF_PSEL(TWIM_SDA, 0, 17)>;
+            bias-pull-up;
+        };
+    };
+
+    i2c0_sleep: i2c0_sleep {
+        group1 {
+            psels = <NRF_PSEL(TWIM_SCL, 0, 20)>,
+                    <NRF_PSEL(TWIM_SDA, 0, 17)>;
+            bias-pull-up;
+            low-power-enable;
+        };
+    };
+};
+
+
